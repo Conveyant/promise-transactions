@@ -1,10 +1,15 @@
 export interface Task {
+    name: string;
     execute(): Promise<any> | any;
     rollback(): Promise<void> | void;
 }
 
+export interface TransactionResults {
+    [name: string]: any;
+    [index: number]: any;
+}
+
 export class Transaction {
-    private stage: number = -1;
     private tasks: Task[] = [];
 
     /**
@@ -19,21 +24,25 @@ export class Transaction {
      * Executes all tasks in the order they were added. The Promise resolves when all tasks have been completed.
      * If a task fails, all completed tasks will be rolled back, and the Promise will be rejected with
      * the original failure.
-     * @returns An array containing the results of each task, in order
+     * @returns An array containing the results of each task, in order.
+     * Results can be accessed by task name or by index.
      */
-    public async execute(): Promise<any[]> {
-        const results = [];
+    public async execute(): Promise<TransactionResults> {
+        const results: TransactionResults = {};
+        let stage = -1;
 
         try {
             for (const task of this.tasks) {
                 const result = await task.execute();
-                results.push(result);
-                this.stage++;
+                stage++;
+
+                results[stage] = result;
+                results[task.name] = result;
             }
 
             return results;
         } catch (error) {
-            for (let i = this.stage; i >= 0; i--) {
+            for (let i = stage; i >= 0; i--) {
                 const task = this.tasks[i];
                 await task.rollback();
             }

@@ -7,12 +7,14 @@ describe('promise-transactions', () => {
         let task2Complete = false;
         const tasks: Task[] = [
             {
+                name: 'task1',
                 execute: () => {
                     task1Complete = true;
                 },
                 rollback: () => { }
             },
             {
+                name: 'task2',
                 execute: () => {
                     task2Complete = true;
                 },
@@ -37,13 +39,14 @@ describe('promise-transactions', () => {
         let rollback1Complete = false;
         const tasks: Task[] = [
             {
-                execute: () => {
-                },
+                name: 'task1',
+                execute: () => { },
                 rollback: () => {
                     rollback1Complete = true;
                 }
             },
             {
+                name: 'task2',
                 execute: () => {
                     throw new Error('Test Error');
                 },
@@ -70,12 +73,14 @@ describe('promise-transactions', () => {
         // Arrange
         const tasks: Task[] = [
             {
+                name: 'task1',
                 execute: () => {
                     return 7;
                 },
                 rollback: () => { }
             },
             {
+                name: 'task2',
                 execute: () => {
                     return { message: '42' };
                 },
@@ -91,8 +96,7 @@ describe('promise-transactions', () => {
 
         // Assert
         expect(results[0]).toBe(7);
-        expect(results[1].message).toBe('42');
+        expect(results.task2.message).toBe('42');
         return done();
-
     });
 });
