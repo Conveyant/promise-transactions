@@ -1,6 +1,6 @@
 export interface Task {
-    execute(context: any): Promise<any> | any;
-    rollback(context: any): Promise<void> | void;
+    execute(): Promise<any> | any;
+    rollback(): Promise<void> | void;
 }
 
 export class Transaction {
@@ -13,5 +13,21 @@ export class Transaction {
      */
     public add(...tasks: Task[]): void {
         this.tasks.push(...tasks);
+    }
+
+    public async execute(): Promise<void> {
+        try {
+            for (const task of this.tasks) {
+                await task.execute();
+                this.stage++;
+            }
+        } catch (error) {
+            for (let i = this.stage; i >= 0; i--) {
+                const task = this.tasks[i];
+                await task.rollback();
+            }
+
+            throw error;
+        }
     }
 }
