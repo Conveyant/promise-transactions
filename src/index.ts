@@ -1,7 +1,20 @@
 export interface Task {
+    /**
+     * The name of the task. This can be used to retrieve intermediate results.
+     */
     name: string;
-    execute(): Promise<any> | any;
-    rollback(): Promise<void> | void;
+
+    /**
+     * The main function to run.
+     * @param context A collection of intermediate results from previous tasks.
+     */
+    execute(context: TransactionResults): Promise<any> | any;
+
+    /**
+     * A function that effectively reverses the main function.
+     * @param context A collection of intermediate results from previous tasks.
+     */
+    rollback(context: TransactionResults): Promise<void> | void;
 }
 
 export interface TransactionResults {
@@ -33,7 +46,7 @@ export class Transaction {
 
         try {
             for (const task of this.tasks) {
-                const result = await task.execute();
+                const result = await task.execute(results);
                 stage++;
 
                 results[stage] = result;
@@ -44,7 +57,7 @@ export class Transaction {
         } catch (error) {
             for (let i = stage; i >= 0; i--) {
                 const task = this.tasks[i];
-                await task.rollback();
+                await task.rollback(results);
             }
 
             throw error;

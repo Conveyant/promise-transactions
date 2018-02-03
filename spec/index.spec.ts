@@ -99,4 +99,34 @@ describe('promise-transactions', () => {
         expect(results.task2.message).toBe('42');
         return done();
     });
+
+    it('should pass intermediate results to tasks', async (done) => {
+        // Arrange
+        const tasks: Task[] = [
+            {
+                name: 'task1',
+                execute: () => {
+                    return 7;
+                },
+                rollback: () => { }
+            },
+            {
+                name: 'task2',
+                execute: (context) => {
+                    return context.task1 + 7;
+                },
+                rollback: () => { }
+            }
+        ];
+
+        const transaction = new Transaction();
+        transaction.add(...tasks);
+
+        // Act
+        const results = await transaction.execute();
+
+        // Assert
+        expect(results.task2).toBe(14);
+        return done();
+    });
 });
