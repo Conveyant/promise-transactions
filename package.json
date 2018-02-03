@@ -1,0 +1,23 @@
+{
+  "name": "promise-transactions",
+  "version": "0.1.0",
+  "description": "Transactions engine for Promise-based asynchronous operations",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Conveyant/promise-transactions.git"
+  },
+  "keywords": [
+    "transaction",
+    "promise"
+  ],
+  "author": "Ben Callaghan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Conveyant/promise-transactions/issues"
+  },
+  "homepage": "https://github.com/Conveyant/promise-transactions#readme"
+}
