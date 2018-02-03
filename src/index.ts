@@ -15,12 +15,23 @@ export class Transaction {
         this.tasks.push(...tasks);
     }
 
-    public async execute(): Promise<void> {
+    /**
+     * Executes all tasks in the order they were added. The Promise resolves when all tasks have been completed.
+     * If a task fails, all completed tasks will be rolled back, and the Promise will be rejected with
+     * the original failure.
+     * @returns An array containing the results of each task, in order
+     */
+    public async execute(): Promise<any[]> {
+        const results = [];
+
         try {
             for (const task of this.tasks) {
-                await task.execute();
+                const result = await task.execute();
+                results.push(result);
                 this.stage++;
             }
+
+            return results;
         } catch (error) {
             for (let i = this.stage; i >= 0; i--) {
                 const task = this.tasks[i];
