@@ -13,7 +13,8 @@
   },
   "keywords": [
     "transaction",
-    "promise"
+    "promise",
+    "rollback"
   ],
   "author": "Ben Callaghan",
   "license": "MIT",
