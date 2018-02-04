@@ -22,6 +22,11 @@ export interface TransactionResults {
     [index: number]: any;
 }
 
+export interface TransactionError {
+    cause: any;
+    rollbackErrors: any[];
+}
+
 export class Transaction {
     private tasks: Task[] = [];
 
@@ -35,10 +40,12 @@ export class Transaction {
 
     /**
      * Executes all tasks in the order they were added. The Promise resolves when all tasks have been completed.
-     * If a task fails, all completed tasks will be rolled back, and the Promise will be rejected with
+     * If a task fails, all completed tasks will be rolled back in reverse order, and the Promise will be rejected with
      * the original failure.
      * @returns An array containing the results of each task, in order.
      * Results can be accessed by task name or by index.
+     * @throws {TransactionError} Will throw an error if any task fails. The error will contain the cause of the failure
+     * and any errors that occur during rollback. 
      */
     public async execute(): Promise<TransactionResults> {
         const results: TransactionResults = {};
@@ -54,12 +61,22 @@ export class Transaction {
             }
 
             return results;
-        } catch (error) {
+        } catch (cause) {
+            const rollbackErrors = [];
+
             for (let i = stage; i >= 0; i--) {
                 const task = this.tasks[i];
-                await task.rollback(results);
+
+                try {
+                    await task.rollback(results);
+                } catch (rollbackError) {
+                    rollbackErrors.push(rollbackError);
+                }
             }
 
+            const error: TransactionError = {
+                cause, rollbackErrors
+            };
             throw error;
         }
     }

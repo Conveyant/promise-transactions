@@ -63,7 +63,7 @@ describe('promise-transactions', () => {
         } catch (error) {
             // Assert
             expect(rollback1Complete).toBeTruthy();
-            expect(error.message).toBe('Test Error');
+            expect(error.cause.message).toBe('Test Error');
         }
 
         return done();
@@ -127,6 +127,39 @@ describe('promise-transactions', () => {
 
         // Assert
         expect(results.task2).toBe(14);
+        return done();
+    });
+
+    it('should throw rollback errors', async (done) => {
+        // Arrange
+        const tasks: Task[] = [
+            {
+                name: 'task1',
+                execute: () => { },
+                rollback: () => {
+                    throw new Error('Error in rollback');
+                }
+            },
+            {
+                name: 'task2',
+                execute: () => {
+                    throw new Error('Test Error');
+                },
+                rollback: () => { }
+            }
+        ];
+
+        const transaction = new Transaction();
+        transaction.add(...tasks);
+
+        try {
+            // Act
+            await transaction.execute();
+        } catch (error) {
+            // Assert
+            expect(error.rollbackErrors[0].message).toBe('Error in rollback');
+        }
+
         return done();
     });
 });
