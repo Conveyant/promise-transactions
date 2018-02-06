@@ -93,7 +93,7 @@ transaction.execute().then(function (results) {
 Similar results can be achieved with TypeScript's `async` and `await` features.
 ```typescript
 import { Transaction, TransactionResults, TransactionError } from 'promise-transactions';
-
+...
 try {
     const results: TransactionResults = await transaction.execute();
     console.log(results[0]); // The first result
