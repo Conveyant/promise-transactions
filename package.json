@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "description": "Transactions engine for Promise-based asynchronous operations",
   "main": "dist/index.js",
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts"
+  ],
   "scripts": {
     "test": "jasmine-ts spec/**/*.spec.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "tsc"
   },
   "repository": {
     "type": "git",
