@@ -1,5 +1,5 @@
 {
-  "name": "promise-transactions",
+  "name": "@conveyant/promise-transactions",
   "version": "0.1.0",
   "description": "Transactions engine for Promise-based asynchronous operations",
   "main": "dist/index.js",

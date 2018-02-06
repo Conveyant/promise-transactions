@@ -5,12 +5,12 @@ Transactions engine for Promise-based asynchronous operations
 
 This package can be installed using npm with the following command:
 ```bash
-npm install --save promise-transactions
+npm install --save @conveyant/promise-transactions
 ```
 
 Yarn may also be used to install this package.
 ```bash
-yarn add promise-transactions
+yarn add @conveyant/promise-transactions
 ```
 
 ## Usage
