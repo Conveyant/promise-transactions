@@ -92,15 +92,22 @@ transaction.execute().then(function (results) {
 
 Similar results can be achieved with TypeScript's `async` and `await` features.
 ```typescript
+import { Transaction, TransactionResults, TransactionError } from 'promise-transactions';
+
 try {
-    const results = await transaction.execute();
+    const results: TransactionResults = await transaction.execute();
     console.log(results[0]); // The first result
     console.log(result.myTask); // The result of 'myTask'
-} catch (error) {
+} catch (e) {
+    const error: TransactionError = e;
     console.error(error.cause); // The original failure
     console.error(error.rollbackErrors); // Array of errors during rollback.
 }
 ```
+
+### TypeScript definitions
+
+A TypeScript definition file is included as part of the package.
 
 ## Building
 
