@@ -19,12 +19,12 @@ yarn add @conveyant/promise-transactions
 
 For ES5/JavaScript, the package can be `require`d as normal.
 ```javascript
-var Transaction = require('promise-transactions').Transaction;
+var Transaction = require('@conveyant/promise-transactions').Transaction;
 ```
 
 For ES6/TypeScript, the package can also be `import`ed.
 ```typescript
-import { Transaction } from 'promise-transactions';
+import { Transaction } from '@conveyant/promise-transactions';
 ```
 
 ### Tasks
@@ -46,7 +46,7 @@ var task = {
 
 ES6/TypeScript arrow functions may also be used.
 ```typescript
-import { Task } from 'promise-transactions';
+import { Task } from '@conveyant/promise-transactions';
 
 const task: Task = {
     name: 'myTask',
@@ -92,7 +92,7 @@ transaction.execute().then(function (results) {
 
 Similar results can be achieved with TypeScript's `async` and `await` features.
 ```typescript
-import { Transaction, TransactionResults, TransactionError } from 'promise-transactions';
+import { Transaction, TransactionResults, TransactionError } from '@conveyant/promise-transactions';
 ...
 try {
     const results: TransactionResults = await transaction.execute();
