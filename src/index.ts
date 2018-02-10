@@ -28,8 +28,14 @@ export interface TransactionError {
     rollbackErrors: any[];
 }
 
-export class Transaction {
+export class Transaction implements Task {
+    public name: string;
+
     private tasks: Task[] = [];
+
+    constructor(name: string) {
+        this.name = name;
+    }
 
     /**
      * Add one or more tasks to be executed as part of this transaction
@@ -68,22 +74,35 @@ export class Transaction {
 
             return results;
         } catch (cause) {
-            const rollbackErrors = [];
-
-            for (let i = stage; i >= 0; i--) {
-                const task = this.tasks[i];
-
-                try {
-                    await task.rollback(results);
-                } catch (rollbackError) {
-                    rollbackErrors.push(rollbackError);
-                }
+            let rollbackErrors = [];
+            try {
+                await this.rollback(results, stage);
+            } catch (errors) {
+                rollbackErrors = errors;
             }
 
             const error: TransactionError = {
                 cause, rollbackErrors
             };
             throw error;
+        }
+    }
+
+    public async rollback(context: TransactionResults, currentStage: number = this.tasks.length - 1): Promise<void> {
+        const rollbackErrors = [];
+
+        for (let i = currentStage; i >= 0; i--) {
+            const task = this.tasks[i];
+
+            try {
+                await task.rollback(context);
+            } catch (rollbackError) {
+                rollbackErrors.push(rollbackError);
+            }
+        }
+
+        if (rollbackErrors.length) {
+            throw rollbackErrors;
         }
     }
 }

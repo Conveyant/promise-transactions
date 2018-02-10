@@ -77,6 +77,16 @@ let tasks: Task[];
 transaction.add(...tasks);
 ```
 
+#### Nesting Transactions
+
+The `Transaction` class implements the `Task` interface, making it possible to nest `Transaction`s and mix-and-match `Transaction`s with normal functions. This is particularly useful if you have another function that returns a `Transaction` object that represents a single step in a larger method chain.
+```javascript
+var inner = getTransaction();
+var transaction = new Transaction();
+transaction.add(inner);
+transaction.add(genericTask);
+```
+
 ### Executing the Transaction
 
 Once all necessary `Task`s have been added, the `Transaction` can be started with the `execute` function. This function returns a `Promise` which resolves when all `Task`s have been completed successfully. The returned object will contain the result of each `Task` which can be accessed by name or index. If one `Task` fails, all `Task`s that succeeded will be rolled back, and the `Promise` will be rejected. The error returned by the rejected `Promise` will contain the original error that caused the failure as well as any errors that occurred during rollback.

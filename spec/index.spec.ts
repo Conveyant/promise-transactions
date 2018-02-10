@@ -22,7 +22,7 @@ describe('promise-transactions', () => {
             }
         ];
 
-        const transaction = new Transaction();
+        const transaction = new Transaction('tasks');
         transaction.add(...tasks);
 
         // Act
@@ -54,7 +54,7 @@ describe('promise-transactions', () => {
             }
         ];
 
-        const transaction = new Transaction();
+        const transaction = new Transaction('tasks');
         transaction.add(...tasks);
 
         try {
@@ -88,7 +88,7 @@ describe('promise-transactions', () => {
             }
         ];
 
-        const transaction = new Transaction();
+        const transaction = new Transaction('tasks');
         transaction.add(...tasks);
 
         // Act
@@ -112,14 +112,14 @@ describe('promise-transactions', () => {
             },
             {
                 name: 'task2',
-                execute: (context) => {
+                execute: context => {
                     return context.task1 + 7;
                 },
                 rollback: () => { }
             }
         ];
 
-        const transaction = new Transaction();
+        const transaction = new Transaction('tasks');
         transaction.add(...tasks);
 
         // Act
@@ -149,7 +149,7 @@ describe('promise-transactions', () => {
             }
         ];
 
-        const transaction = new Transaction();
+        const transaction = new Transaction('tasks');
         transaction.add(...tasks);
 
         // Act
@@ -179,7 +179,7 @@ describe('promise-transactions', () => {
             }
         ];
 
-        const transaction = new Transaction();
+        const transaction = new Transaction('tasks');
         transaction.add(...tasks);
 
         try {
@@ -190,6 +190,52 @@ describe('promise-transactions', () => {
             expect(error.rollbackErrors[0].message).toBe('Error in rollback');
         }
 
+        return done();
+    });
+
+    it('should allow nested transactions', async (done) => {
+        // Arrange
+        const tasks: Task[] = [
+            {
+                name: 'inner1',
+                execute: () => {
+                    return 7;
+                },
+                rollback: () => { }
+            },
+            {
+                name: 'inner2',
+                execute: context => {
+                    return context.inner1 + 7;
+                },
+                rollback: () => { }
+            }
+        ];
+
+        const inner = new Transaction('inner');
+        inner.add(...tasks);
+
+        const transaction = new Transaction('outer');
+        transaction.add(inner);
+        transaction.add({
+            name: 'outerTask',
+            execute: context => {
+                return context.inner.final + 10;
+            },
+            rollback: () => {}
+        });
+
+        // Act
+        let results = {final: 1};
+        try {
+            results = await transaction.execute();
+
+        } catch (error) {
+            fail(error);
+        }
+
+        // Assert
+        expect(results.final).toBe(24);
         return done();
     });
 });
