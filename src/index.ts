@@ -20,6 +20,7 @@ export interface Task {
 export interface TransactionResults {
     [name: string]: any;
     [index: number]: any;
+    final: any;
 }
 
 export interface TransactionError {
@@ -48,7 +49,9 @@ export class Transaction {
      * and any errors that occur during rollback. 
      */
     public async execute(): Promise<TransactionResults> {
-        const results: TransactionResults = {};
+        const results: TransactionResults = {
+            final: null
+        };
         let stage = -1;
 
         try {
@@ -59,6 +62,9 @@ export class Transaction {
                 results[stage] = result;
                 results[task.name] = result;
             }
+
+            // Update the final result
+            results.final = results[stage];
 
             return results;
         } catch (cause) {

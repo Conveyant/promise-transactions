@@ -105,6 +105,11 @@ try {
 }
 ```
 
+The final result of the transaction is also available in the `final` property of the `results` object.
+```javascript
+console.log(results.final); // Result of the final task
+```
+
 ### TypeScript definitions
 
 A TypeScript definition file is included as part of the package.

@@ -130,6 +130,36 @@ describe('promise-transactions', () => {
         return done();
     });
 
+    it('should explicitly name the final result', async (done) => {
+        // Arrange
+        const tasks: Task[] = [
+            {
+                name: 'task1',
+                execute: () => {
+                    return 7;
+                },
+                rollback: () => { }
+            },
+            {
+                name: 'task2',
+                execute: () => {
+                    return 42;
+                },
+                rollback: () => { }
+            }
+        ];
+
+        const transaction = new Transaction();
+        transaction.add(...tasks);
+
+        // Act
+        const results = await transaction.execute();
+
+        // Assert
+        expect(results.final).toBe(42);
+        return done();
+    });
+
     it('should throw rollback errors', async (done) => {
         // Arrange
         const tasks: Task[] = [
