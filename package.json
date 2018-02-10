@@ -9,8 +9,8 @@
   ],
   "scripts": {
     "test": "jasmine-ts spec/**/*.spec.ts",
-    "build": "tsc",
-    "prepare": "tsc"
+    "build": "tsc --inlineSources false -p .",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",

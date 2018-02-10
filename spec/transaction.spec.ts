@@ -1,4 +1,4 @@
-import { Task, Transaction } from "../src/index";
+import { InvalidOperationError, Task, Transaction } from "../src/index";
 
 describe('promise-transactions', () => {
     it('should execute all tasks', async (done) => {
@@ -222,11 +222,11 @@ describe('promise-transactions', () => {
             execute: context => {
                 return context.inner.final + 10;
             },
-            rollback: () => {}
+            rollback: () => { }
         });
 
         // Act
-        let results = {final: 1};
+        let results = { final: 1 };
         try {
             results = await transaction.execute();
 
@@ -236,6 +236,62 @@ describe('promise-transactions', () => {
 
         // Assert
         expect(results.final).toBe(24);
+        return done();
+    });
+
+    it('should throw an error if executed without tasks', async (done) => {
+        // Arrange
+        const transaction = new Transaction('noTasks');
+
+        try {
+            // Act
+            await transaction.execute();
+        } catch (error) {
+            // Assert
+            expect(error.message).toContain('at least one Task');
+        }
+
+        return done();
+    });
+
+    it('should throw an error if executed twice', async (done) => {
+        // Arrange
+        const transaction = new Transaction('noTasks');
+        transaction.add({
+            name: 'empty',
+            execute: () => { },
+            rollback: () => { }
+        });
+
+        try {
+            // Act
+            await transaction.execute();
+            await transaction.execute();
+        } catch (error) {
+            // Assert
+            expect(error.message).toContain('only be executed once.');
+        }
+
+        return done();
+    });
+
+    it('should throw an error if rolled back before executing', async (done) => {
+        // Arrange
+        const transaction = new Transaction('noTasks');
+        transaction.add({
+            name: 'empty',
+            execute: () => { },
+            rollback: () => { }
+        });
+
+        try {
+            // Act
+            await transaction.rollback({ final: null });
+        } catch (error) {
+            // Assert
+            expect(error.message).toContain('cannot be rolled back');
+        }
+
         return done();
     });
 });
